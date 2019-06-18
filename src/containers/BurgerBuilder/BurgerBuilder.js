@@ -3,8 +3,9 @@ import Burger from "../../components/Burger/Burger";
 import BuildControls from "../../components/Burger/BuildControls/BuildControls";
 import Modal from "../../components/UI/Modal/Modal";
 import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
-import axios from "../../axios-orders";
 import Spinner from "../../components/UI/Spinner/Spinner";
+import withErrorHandler from "../../hoc/withErrorHandler/withErrorHandler";
+import axios from "../../axios-orders";
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
@@ -122,6 +123,9 @@ class BurgerBuilder extends React.Component {
         for (let key in disabledInfo) {
             disabledInfo[key] = disabledInfo[key] <= 0;
         }
+
+/* The spinner is shown till we get back a response from the POST request made in purchaseContinueHandler() */
+
         let orderSummary = (
             <OrderSummary
                 price={this.state.totalPrice.toFixed(2)}
@@ -155,4 +159,4 @@ class BurgerBuilder extends React.Component {
     }
 }
 
-export default BurgerBuilder;
+export default withErrorHandler(BurgerBuilder, axios);

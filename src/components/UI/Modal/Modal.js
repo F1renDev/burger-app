@@ -4,7 +4,7 @@ import Backdrop from '../Backdrop/Backdrop';
 
 class Modal extends React.Component {
 
-    /* This should update props or children passed to the component update */
+    /* This should update the component only if the show property changed or the children component(s) changed */
     shouldComponentUpdate(nextProps, nextState) {
             return nextProps.show !== this.props.show || nextProps.children !== this.props.children;
     }
