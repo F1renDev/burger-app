@@ -5,27 +5,50 @@ import Modal from "../../components/UI/Modal/Modal";
 /* Error handling */
 
 const withErrorHandler = (WrappedComponent, axios) => {
-    
     return class Err extends React.Component {
-        state = {
-            error: null
-        };
+        /* Constructor used to aviod using the deprecated componentWillUpdate hook */
+        /* And I needed that hook bacuse the componentDidMount is no longer sutable here */
+        /* Because componentDidMount is called after all child components are rendered and their */
+        /* componentDidMount was called */
 
-
-        /* Setting up axios interceptops to handle errors */
-        componentDidMount() {
-
+        constructor() {
+            super();
+            /* Setting up axios interceptops to handle errors */
             /* Clearing the state.error every time a new request is sent */
-            axios.interceptors.request.use((request) => {
+
+            this.requestInterceptor = axios.interceptors.request.use((request) => {
                 this.setState({ error: null });
                 return request;
             });
 
+            this.responseInterceptor = axios.interceptors.response.use(
+                (response) => response,
+                (error) => {
+                    this.setState({ error: error });
+                }
+            );
 
-            axios.interceptors.response.use(response => response, (error) => {
-                this.setState({ error: error });
-            });
+            this.state = {
+                error: null
+            };
         }
+
+        /* Deleting the unused interceptors */
+        /* !Can also be done with the lifecycle hooks! */
+        componentWillUnmount(){
+            axios.interceptors.request.eject(this.requestInterceptor);
+            axios.interceptors.response.eject(this.responseInterceptor);
+        }
+
+        // componentWillMount() {
+        //     axios.interceptors.request.use((request) => {
+        //         this.setState({ error: null });
+        //         return request;
+        //     });
+        //     axios.interceptors.response.use(response => response, (error) => {
+        //         this.setState({ error: error });
+        //     });
+        // }
 
         /* Closing the Modal when the Backdrop is clicked */
         errorConfirmedHandler = () => {
@@ -40,9 +63,9 @@ const withErrorHandler = (WrappedComponent, axios) => {
                         modalClosed={this.errorConfirmedHandler}
                         show={this.state.error}>
                         {this.state.error ? this.state.error.message : null}
-                    </Modal> 
+                    </Modal>
                     {/*Distributing the possible props of the WrappedComponent*/}
-                    <WrappedComponent {...this.props} /> 
+                    <WrappedComponent {...this.props} />
                 </React.Fragment>
             );
         }

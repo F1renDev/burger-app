@@ -16,17 +16,29 @@ const INGREDIENT_PRICES = {
 
 class BurgerBuilder extends React.Component {
     state = {
-        ingredients: {
-            salad: 0,
-            cheese: 0,
-            bacon: 0,
-            meat: 0
-        },
+        ingredients: null,
         totalPrice: 5,
         purchasable: false,
         purchasing: false,
-        loading: false
+        loading: false,
+        error: false
     };
+
+    /* Getting the ingredients dynamically from the Firebase when the BurgerBuilder is mounted */
+    componentDidMount() {
+        axios
+            .get("https://burger-app-35129.firebaseio.com/ingredients.json")
+            .then((response) => {
+                this.setState({
+                    ingredients: response.data
+                });
+            })
+            .catch(error => {
+                this.setState({
+                    error: true
+                })
+            });
+    }
 
     updatePurchaseState = (ingredients) => {
         const sum = Object.keys(ingredients)
@@ -124,16 +136,36 @@ class BurgerBuilder extends React.Component {
             disabledInfo[key] = disabledInfo[key] <= 0;
         }
 
-/* The spinner is shown till we get back a response from the POST request made in purchaseContinueHandler() */
+        /* The spinner is shown till we get back a response from the POST request made in purchaseContinueHandler() */
+        /* orderSummary is waiting for data to be fetched from the Firebase */
+        let orderSummary = null;
 
-        let orderSummary = (
-            <OrderSummary
-                price={this.state.totalPrice.toFixed(2)}
-                purchaseCancelled={this.purchaseCancelHandler}
-                purchaseContinued={this.purchaseContinueHandler}
-                ingredients={this.state.ingredients}
-            />
-        );
+        /* Spinner is shown before the ingredients are retrieved from the Firebase into the state.ingredients */
+        /* And a message is shown if they could not be retrieved */
+        let burger = this.state.error ? <p style={{textAlign: 'center'}}>Ingredients can't be loaded</p> : <Spinner />;
+        if (this.state.ingredients) {
+            burger = (
+                <React.Fragment>
+                    <Burger ingredients={this.state.ingredients} />
+                    <BuildControls
+                        price={this.state.totalPrice}
+                        ingredientRemoved={this.removeIngredientHandler}
+                        ingredientAdded={this.addIngredientHandler}
+                        disabled={disabledInfo}
+                        ordered={this.purchaseHandler}
+                        purchasable={this.state.purchasable}
+                    />
+                </React.Fragment>
+            );
+            orderSummary = (
+                <OrderSummary
+                    price={this.state.totalPrice.toFixed(2)}
+                    purchaseCancelled={this.purchaseCancelHandler}
+                    purchaseContinued={this.purchaseContinueHandler}
+                    ingredients={this.state.ingredients}
+                />
+            );
+        }
         if (this.state.loading) {
             orderSummary = <Spinner />;
         }
@@ -145,15 +177,7 @@ class BurgerBuilder extends React.Component {
                     modalClosed={this.purchaseCancelHandler}>
                     {orderSummary}
                 </Modal>
-                <Burger ingredients={this.state.ingredients} />
-                <BuildControls
-                    price={this.state.totalPrice}
-                    ingredientRemoved={this.removeIngredientHandler}
-                    ingredientAdded={this.addIngredientHandler}
-                    disabled={disabledInfo}
-                    ordered={this.purchaseHandler}
-                    purchasable={this.state.purchasable}
-                />
+                {burger}
             </React.Fragment>
         );
     }
