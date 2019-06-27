@@ -102,30 +102,32 @@ class BurgerBuilder extends React.Component {
         });
     };
 
+    /* Going to the Checkout component after the "Continue" button in the modal was clicked */
     purchaseContinueHandler = () => {
-        this.setState({ loading: true });
-        const price = this.state.totalPrice.toFixed(2);
-        const order = {
-            ingredients: this.state.ingredients,
-            price: price,
-            customer: {
-                name: "Customer-1",
-                adress: {
-                    street: "CustomerStreet-1"
-                },
-                phone: "322223",
-                email: "CustomerEmail@1.com"
-            },
-            deliveryMethod: "fastest"
-        };
-        axios
-            .post("/orders.json", order)
-            .then((response) => {
-                this.setState({ loading: false, purchasing: false });
-            })
-            .catch((error) => {
-                this.setState({ loading: false, purchasing: false });
-            });
+        // this.setState({ loading: true });
+        // const price = this.state.totalPrice.toFixed(2);
+        // const order = {
+        //     ingredients: this.state.ingredients,
+        //     price: price,
+        //     customer: {
+        //         name: "Customer-1",
+        //         adress: {
+        //             street: "CustomerStreet-1"
+        //         },
+        //         phone: "322223",
+        //         email: "CustomerEmail@1.com"
+        //     },
+        //     deliveryMethod: "fastest"
+        // };
+        // axios
+        //     .post("/orders.json", order)
+        //     .then((response) => {
+        //         this.setState({ loading: false, purchasing: false });
+        //     })
+        //     .catch((error) => {
+        //         this.setState({ loading: false, purchasing: false });
+        //     });
+        this.props.history.push('/checkout');
     };
 
     render() {
