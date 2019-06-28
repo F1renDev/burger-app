@@ -33,10 +33,10 @@ class BurgerBuilder extends React.Component {
                     ingredients: response.data
                 });
             })
-            .catch(error => {
+            .catch((error) => {
                 this.setState({
                     error: true
-                })
+                });
             });
     }
 
@@ -127,7 +127,17 @@ class BurgerBuilder extends React.Component {
         //     .catch((error) => {
         //         this.setState({ loading: false, purchasing: false });
         //     });
-        this.props.history.push('/checkout');
+
+/* Passing the ingredients for the burger on the checkout page with a GET request */
+        const queryParams = [];
+        for (let i in this.state.ingredients) {
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+        }
+        const queryString = queryParams.join('&');
+        this.props.history.push({
+            pathname: "/checkout",
+            search: "?" + queryString
+        });
     };
 
     render() {
@@ -144,7 +154,11 @@ class BurgerBuilder extends React.Component {
 
         /* Spinner is shown before the ingredients are retrieved from the Firebase into the state.ingredients */
         /* And a message is shown if they could not be retrieved */
-        let burger = this.state.error ? <p style={{textAlign: 'center'}}>Ingredients can't be loaded</p> : <Spinner />;
+        let burger = this.state.error ? (
+            <p style={{ textAlign: "center" }}>Ingredients can't be loaded</p>
+        ) : (
+            <Spinner />
+        );
         if (this.state.ingredients) {
             burger = (
                 <React.Fragment>
