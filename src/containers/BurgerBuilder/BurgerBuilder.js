@@ -104,36 +104,17 @@ class BurgerBuilder extends React.Component {
 
     /* Going to the Checkout component after the "Continue" button in the modal was clicked */
     purchaseContinueHandler = () => {
-        // this.setState({ loading: true });
-        // const price = this.state.totalPrice.toFixed(2);
-        // const order = {
-        //     ingredients: this.state.ingredients,
-        //     price: price,
-        //     customer: {
-        //         name: "Customer-1",
-        //         adress: {
-        //             street: "CustomerStreet-1"
-        //         },
-        //         phone: "322223",
-        //         email: "CustomerEmail@1.com"
-        //     },
-        //     deliveryMethod: "fastest"
-        // };
-        // axios
-        //     .post("/orders.json", order)
-        //     .then((response) => {
-        //         this.setState({ loading: false, purchasing: false });
-        //     })
-        //     .catch((error) => {
-        //         this.setState({ loading: false, purchasing: false });
-        //     });
-
-/* Passing the ingredients for the burger on the checkout page with a GET request */
+        /* Passing the ingredients for the burger on the checkout page with a GET request */
         const queryParams = [];
         for (let i in this.state.ingredients) {
-            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+            queryParams.push(
+                encodeURIComponent(i) +
+                    "=" +
+                    encodeURIComponent(this.state.ingredients[i])
+            );
         }
-        const queryString = queryParams.join('&');
+        queryParams.push("price=" + this.state.totalPrice);
+        const queryString = queryParams.join("&");
         this.props.history.push({
             pathname: "/checkout",
             search: "?" + queryString
