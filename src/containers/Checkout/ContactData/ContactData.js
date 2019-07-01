@@ -3,6 +3,7 @@ import React from "react";
 import styles from "./ContactData.module.css";
 import Button from "../../../components/UI/Button/Button";
 import Spinner from "../../../components/UI/Spinner/Spinner";
+import Input from '../../../components/UI/Input/Input';
 import axios from "../../../axios-orders";
 
 /* ContactData component to get the user info before placing an order */
@@ -56,16 +57,16 @@ class ContactData extends React.Component {
         /* The Spinner is shown untill the POST request is executed */
         let form = (
             <form>
-                <input type="text" name="name" placeholder="Your Name" />
-                <input type="email" name="email" placeholder="Your Mail" />
-                <input
+                <Input inputtype='input' type="text" name="name" placeholder="Your Name" />
+                <Input inputtype='input' type="email" name="email" placeholder="Your Mail" />
+                <Input inputtype='input'
                     type="tel"
                     name="phone"
                     placeholder="Your Phone Number"
                     pattern="[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}"
                 />
-                <input type="text" name="street" placeholder="Street" />
-                <input type="number" name="apartment" placeholder="Apartment" />
+                <Input inputtype='input' type="text" name="street" placeholder="Street" />
+                <Input inputtype='input' type="number" name="apartment" placeholder="Apartment" />
                 <br />
                 <Button btnType="success" clicked={this.orderHandler}>
                     ORDER
