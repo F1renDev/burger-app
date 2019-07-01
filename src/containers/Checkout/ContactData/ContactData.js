@@ -3,19 +3,58 @@ import React from "react";
 import styles from "./ContactData.module.css";
 import Button from "../../../components/UI/Button/Button";
 import Spinner from "../../../components/UI/Spinner/Spinner";
-import Input from '../../../components/UI/Input/Input';
+import Input from "../../../components/UI/Input/Input";
 import axios from "../../../axios-orders";
 
 /* ContactData component to get the user info before placing an order */
 
 class ContactData extends React.Component {
+    /* The state contains the identefiers of the form elements + object with configuration setup */
     state = {
-        name: "",
-        email: "",
-        phone: "",
-        adress: {
-            street: "",
-            apartment: ""
+        orderForm: {
+            name: {
+                elementType: "input",
+                elementConfig: {
+                    type: "text",
+                    placeholder: "Your Name"
+                },
+                value: ""
+            },
+            street: {
+                elementType: "input",
+                elementConfig: {
+                    type: "text",
+                    placeholder: "Street"
+                },
+                value: ""
+            },
+            phone: {
+                elementType: "input",
+                elementConfig: {
+                    type: "tel",
+                    placeholder: "Your Phone Number",
+                    pattern: "[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}"
+                },
+                value: ""
+            },
+            email: {
+                elementType: "input",
+                elementConfig: {
+                    type: "email",
+                    placeholder: "Your E-mail"
+                },
+                value: ""
+            },
+            deliveryMethod: {
+                elementType: "select",
+                elementConfig: {
+                    options: [
+                        { value: "fastest", displayValue: "Fastest" },
+                        { value: "cheapest", displayValue: "Cheapest" }
+                    ]
+                },
+                value: ""
+            }
         },
         loading: false
     };
@@ -29,16 +68,7 @@ class ContactData extends React.Component {
         const price = parseFloat(this.props.price).toFixed(2);
         const order = {
             ingredients: this.props.ingredients,
-            price: price,
-            customer: {
-                name: "Customer-1",
-                adress: {
-                    street: "CustomerStreet-1"
-                },
-                phone: "322223",
-                email: "CustomerEmail@1.com"
-            },
-            deliveryMethod: "fastest"
+            price: price
         };
         axios
             .post("/orders.json", order)
@@ -53,26 +83,43 @@ class ContactData extends React.Component {
             });
     };
 
+    /* Handling the user input */
+    inputChangedHandler = (event, inputId) => {
+        const updatedOrderForm = {...this.state.orderForm};
+        const updatedFormElement = {...updatedOrderForm[inputId]};
+        updatedFormElement.value = event.target.value;
+        updatedOrderForm[inputId] = updatedFormElement;
+        this.setState({orderForm: updatedOrderForm});
+    }
+
     render() {
-        /* The Spinner is shown untill the POST request is executed */
+        /* Turning the orderForm object into an array to loop through */
+        const formElementsArray = [];
+        for (let key in this.state.orderForm) {
+            formElementsArray.push({
+                id: key,
+                config: this.state.orderForm[key]
+            });
+        }
+
+        /* The form is created dynamically based on the config in the state */
         let form = (
             <form>
-                <Input inputtype='input' type="text" name="name" placeholder="Your Name" />
-                <Input inputtype='input' type="email" name="email" placeholder="Your Mail" />
-                <Input inputtype='input'
-                    type="tel"
-                    name="phone"
-                    placeholder="Your Phone Number"
-                    pattern="[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}"
-                />
-                <Input inputtype='input' type="text" name="street" placeholder="Street" />
-                <Input inputtype='input' type="number" name="apartment" placeholder="Apartment" />
-                <br />
+                {formElementsArray.map((formElement) => (
+                    <Input
+                        key={formElement.id}
+                        elementType={formElement.config.elementType}
+                        elementConfig={formElement.config.elementConfig}
+                        value={formElement.config.value}
+                        changed={(event) => this.inputChangedHandler(event, formElement.id)}
+                    />
+                ))}
                 <Button btnType="success" clicked={this.orderHandler}>
                     ORDER
                 </Button>
             </form>
         );
+        /* The Spinner is shown untill the POST request is executed */
         if (this.state.loading) {
             form = <Spinner />;
         }

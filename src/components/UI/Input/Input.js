@@ -1,20 +1,55 @@
 import React from "react";
 
-import styles from './Input.module.css';
+import styles from "./Input.module.css";
 
 /* Input component for the order form */
 const input = (props) => {
     let inputElement = null;
 
-    switch (props.inputtype) {
+    switch (props.elementType) {
         case "input":
-            inputElement = <input className={styles.inputElement} {...props} />;
+            inputElement = (
+                <input
+                    className={styles.inputElement}
+                    {...props.elementConfig}
+                    value={props.value}
+                    onChange={props.changed}
+                />
+            );
             break;
         case "textarea":
-            inputElement = <textarea className={styles.inputElement} {...props} />;
+            inputElement = (
+                <textarea
+                    className={styles.inputElement}
+                    {...props.elementConfig}
+                    value={props.value}
+                    onChange={props.changed}
+                />
+            );
+            break;
+        case "select":
+            inputElement = (
+                <select
+                    className={styles.inputElement}
+                    value={props.value}
+                    onChange={props.changed}>
+                    {props.elementConfig.options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.displayValue}
+                        </option>
+                    ))}
+                </select>
+            );
             break;
         default:
-            inputElement = <input className={styles.inputElement} {...props} />;
+            inputElement = (
+                <input
+                    className={styles.inputElement}
+                    {...props.elementConfig}
+                    value={props.value}
+                    onChange={props.changed}
+                />
+            );
     }
 
     return (
