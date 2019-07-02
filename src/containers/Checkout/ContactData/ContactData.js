@@ -18,7 +18,13 @@ class ContactData extends React.Component {
                     type: "text",
                     placeholder: "Your Name"
                 },
-                value: ""
+                value: "",
+                /* Checking the validity of user's input */
+                validation: {
+                    required: true
+                },
+                valid: false,
+                touched: false
             },
             street: {
                 elementType: "input",
@@ -26,16 +32,27 @@ class ContactData extends React.Component {
                     type: "text",
                     placeholder: "Street"
                 },
-                value: ""
+                value: "",
+                validation: {
+                    required: true
+                },
+                valid: false,
+                touched: false
             },
             phone: {
                 elementType: "input",
                 elementConfig: {
                     type: "tel",
-                    placeholder: "Your Phone Number",
-                    pattern: "[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}"
+                    placeholder: "Your Phone Number"
                 },
-                value: ""
+                value: "",
+                validation: {
+                    required: true,
+                    minLength: 9,
+                    maxLength: 9
+                },
+                valid: false,
+                touched: false
             },
             email: {
                 elementType: "input",
@@ -43,7 +60,12 @@ class ContactData extends React.Component {
                     type: "email",
                     placeholder: "Your E-mail"
                 },
-                value: ""
+                value: "",
+                validation: {
+                    required: true
+                },
+                valid: false,
+                touched: false
             },
             deliveryMethod: {
                 elementType: "select",
@@ -53,9 +75,15 @@ class ContactData extends React.Component {
                         { value: "cheapest", displayValue: "Cheapest" }
                     ]
                 },
-                value: ""
+                value: "fastest",
+                validation: {
+                    required: false
+                },
+                valid: true,
+                touched: false
             }
         },
+        formIsValid: false,
         loading: false
     };
 
@@ -66,7 +94,7 @@ class ContactData extends React.Component {
         this.setState({ loading: true });
         const price = parseFloat(this.props.price).toFixed(2);
         const formData = {};
-        for (let formElementId in this.state.orderForm){
+        for (let formElementId in this.state.orderForm) {
             formData[formElementId] = this.state.orderForm[formElementId].value;
         }
         const order = {
@@ -87,14 +115,53 @@ class ContactData extends React.Component {
             });
     };
 
+    checkValidity = (value, rules) => {
+        /* isValid is set initially to true because even if one of the if checks in this block returnes false
+the isValid can be set to true by the last check and thus ingore all the previous checks
+ where it could'ev been set to false */
+        let isValid = true;
+
+        if (rules.required) {
+            /* Using trim() because whitespaces are not treated as empty string */
+            isValid = value.trim() !== "" && isValid;
+        }
+
+        if (rules.minLength) {
+            isValid = value.length >= rules.minLength && isValid;
+        }
+
+        if (rules.maxLength) {
+            isValid = value.length <= rules.maxLength && isValid;
+        }
+
+        return isValid;
+    };
+
     /* Handling the user input */
     inputChangedHandler = (event, inputId) => {
-        const updatedOrderForm = {...this.state.orderForm};
-        const updatedFormElement = {...updatedOrderForm[inputId]};
+        const updatedOrderForm = { ...this.state.orderForm };
+        const updatedFormElement = { ...updatedOrderForm[inputId] };
         updatedFormElement.value = event.target.value;
+        updatedFormElement.valid = this.checkValidity(
+            updatedFormElement.value,
+            updatedFormElement.validation
+        );
+        updatedFormElement.touched = true;
         updatedOrderForm[inputId] = updatedFormElement;
-        this.setState({orderForm: updatedOrderForm});
-    }
+        /* If all inputs have valid === true the overall form receives formIsValid === true
+so that it is only submitted to the firebase if everything is valid */
+
+/* formIsValid is set initially to true because even if one iteration returnes false
+the formIsValid can be set to true by the last iteration and thus ingore all the previous iterations
+ where it could'ev been set to false */
+        let formIsValid = true;
+        for (let inputIdentifier in updatedOrderForm) {
+            formIsValid =
+                updatedOrderForm[inputIdentifier].valid && formIsValid;
+        }
+
+        this.setState({ orderForm: updatedOrderForm, formIsValid: formIsValid });
+    };
 
     render() {
         /* Turning the orderForm object into an array to loop through */
@@ -115,12 +182,15 @@ class ContactData extends React.Component {
                         elementType={formElement.config.elementType}
                         elementConfig={formElement.config.elementConfig}
                         value={formElement.config.value}
-                        changed={(event) => this.inputChangedHandler(event, formElement.id)}
+                        invalid={!formElement.config.valid}
+                        shouldValidate={formElement.config.validation}
+                        touched={formElement.config.touched}
+                        changed={(event) =>
+                            this.inputChangedHandler(event, formElement.id)
+                        }
                     />
                 ))}
-                <Button btnType="success">
-                    ORDER
-                </Button>
+                <Button btnType="success" disabled={!this.state.formIsValid}>ORDER</Button>
             </form>
         );
         /* The Spinner is shown untill the POST request is executed */

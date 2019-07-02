@@ -5,12 +5,19 @@ import styles from "./Input.module.css";
 /* Input component for the order form */
 const input = (props) => {
     let inputElement = null;
+    const inputStyles = [styles.inputElement];
+
+/* Adding the styling for invalid form field if the entered data is not valid
+but only after the user touched the form field */
+    if (props.invalid && props.shouldValidate && props.touched) {
+        inputStyles.push(styles.invalid);
+    }
 
     switch (props.elementType) {
         case "input":
             inputElement = (
                 <input
-                    className={styles.inputElement}
+                    className={inputStyles.join(" ")}
                     {...props.elementConfig}
                     value={props.value}
                     onChange={props.changed}
