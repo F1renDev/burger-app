@@ -59,16 +59,20 @@ class ContactData extends React.Component {
         loading: false
     };
 
-    /* Going to send the order data to the database at some point */
-    /* TODO: implement the database integration */
+    /* The info about a burger's ingredients and a user who ordered it is sent to firebase db */
     orderHandler = (event) => {
         event.preventDefault();
         // console.log(this.props.ingredients);
         this.setState({ loading: true });
         const price = parseFloat(this.props.price).toFixed(2);
+        const formData = {};
+        for (let formElementId in this.state.orderForm){
+            formData[formElementId] = this.state.orderForm[formElementId].value;
+        }
         const order = {
             ingredients: this.props.ingredients,
-            price: price
+            price: price,
+            orderData: formData
         };
         axios
             .post("/orders.json", order)
@@ -104,7 +108,7 @@ class ContactData extends React.Component {
 
         /* The form is created dynamically based on the config in the state */
         let form = (
-            <form>
+            <form onSubmit={this.orderHandler}>
                 {formElementsArray.map((formElement) => (
                     <Input
                         key={formElement.id}
@@ -114,7 +118,7 @@ class ContactData extends React.Component {
                         changed={(event) => this.inputChangedHandler(event, formElement.id)}
                     />
                 ))}
-                <Button btnType="success" clicked={this.orderHandler}>
+                <Button btnType="success">
                     ORDER
                 </Button>
             </form>
