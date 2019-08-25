@@ -1,10 +1,10 @@
 import React from "react";
-
 import styles from "./ContactData.module.css";
 import Button from "../../../components/UI/Button/Button";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";
 import axios from "../../../axios-orders";
+import { connect } from "react-redux";
 
 // ContactData component to get the user info before placing an order
 
@@ -98,7 +98,7 @@ class ContactData extends React.Component {
       formData[formElementId] = this.state.orderForm[formElementId].value;
     }
     const order = {
-      ingredients: this.props.ingredients,
+      ingredients: this.props.ings,
       price: price,
       orderData: formData
     };
@@ -116,9 +116,9 @@ class ContactData extends React.Component {
   };
 
   checkValidity = (value, rules) => {
-// isValid is set initially to true because even if one of the if checks in this block returnes false
-// the isValid can be set to true by the last check and thus ingore all the previous checks
-// where it could have been set to false
+    // isValid is set initially to true because even if one of the if checks in this block returnes false
+    // the isValid can be set to true by the last check and thus ingore all the previous checks
+    // where it could have been set to false
     let isValid = true;
 
     if (rules.required) {
@@ -187,7 +187,7 @@ class ContactData extends React.Component {
             changed={(event) => this.inputChangedHandler(event, formElement.id)}
           />
         ))}
-        <Button btnType="success" disabled={!this.state.formIsValid}>
+        <Button btnType='success' disabled={!this.state.formIsValid}>
           ORDER
         </Button>
       </form>
@@ -205,4 +205,11 @@ class ContactData extends React.Component {
   }
 }
 
-export default ContactData;
+const mapStateToProps = state => {
+  return {
+    ings: state.ingredients,
+    price: state.totalPrice
+  }
+}
+
+export default connect(mapStateToProps)(ContactData);
