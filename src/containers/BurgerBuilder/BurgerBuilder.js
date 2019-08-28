@@ -7,30 +7,17 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 import withErrorHandler from "../../hoc/withErrorHandler/withErrorHandler";
 import axios from "../../axios-orders";
 import { connect } from "react-redux";
-import * as actionTypes from "../../store/actions";
+import * as actions from '../../store/actions/index'
 
 class BurgerBuilder extends React.Component {
   state = {
     purchasing: false,
-    loading: false,
-    error: false
+    
   };
 
-  // Getting the ingredients dynamically from the Firebase when the BurgerBuilder is mounted
+
   componentDidMount() {
-    console.log(this.props);
-    // axios
-    //   .get("https://burger-app-35129.firebaseio.com/ingredients.json")
-    //   .then((response) => {
-    //     this.setState({
-    //       ingredients: response.data
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     this.setState({
-    //       error: true
-    //     });
-    //   });
+    this.props.onInitIngredients();
   }
 
   // if there are no ingredients added, 'false' is returned and passed further to disable
@@ -63,6 +50,7 @@ class BurgerBuilder extends React.Component {
 
   // Going to the Checkout component after the "Continue" button in the modal was clicked
   purchaseContinueHandler = () => {
+    this.props.onInitPurchase();
     // Passing the ingredients for the burger on the checkout page with a GET request
     this.props.history.push("/checkout");
   };
@@ -84,7 +72,7 @@ class BurgerBuilder extends React.Component {
 
     /* Spinner is shown before the ingredients are retrieved from the Firebase into the state.ingredients */
     /* And a message is shown if they could not be retrieved */
-    let burger = this.state.error ? (
+    let burger = this.props.error ? (
       <p style={{ textAlign: "center" }}>Ingredients can't be loaded</p>
     ) : (
       <Spinner />
@@ -112,9 +100,6 @@ class BurgerBuilder extends React.Component {
         />
       );
     }
-    if (this.state.loading) {
-      orderSummary = <Spinner />;
-    }
 
     return (
       <React.Fragment>
@@ -129,22 +114,28 @@ class BurgerBuilder extends React.Component {
   }
 }
 
+// getting the state from the redux store
 const mapStateToProps = (state) => {
   return {
-    ings: state.ingredients,
-    price: state.totalPrice
+    ings: state.burgerBuilder.ingredients,
+    price: state.burgerBuilder.totalPrice,
+    error: state.burgerBuilder.error
   };
 };
 
+// mapping the dispatched actions to props
 const mapDispatchToProps = (dispatch) => {
   return {
     onIngredientAdded: (ingName) =>
-      dispatch({ type: actionTypes.ADD_INGREDIENT, ingredientName: ingName }),
+      dispatch(actions.addIngredient(ingName)),
     onIngredientRemoved: (ingName) =>
-      dispatch({ type: actionTypes.REMOVE_INGREDIENT, ingredientName: ingName })
+      dispatch(actions.removeIngredient(ingName)),
+      onInitIngredients: () => dispatch(actions.initIngridients()),
+      onInitPurchase: () => dispatch(actions.purchaseInit())
   };
 };
 
+//connecting the component and the redux store
 export default connect(
   mapStateToProps,
   mapDispatchToProps

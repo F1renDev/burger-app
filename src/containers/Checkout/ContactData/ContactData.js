@@ -5,6 +5,8 @@ import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";
 import axios from "../../../axios-orders";
 import { connect } from "react-redux";
+import withErrorHandler from "../../../hoc/withErrorHandler/withErrorHandler";
+import * as actions from "../../../store/actions/index";
 
 // ContactData component to get the user info before placing an order
 
@@ -83,15 +85,14 @@ class ContactData extends React.Component {
         touched: false
       }
     },
-    formIsValid: false,
-    loading: false
+    formIsValid: false
   };
 
   // The info about a burger's ingredients and a user who ordered it is sent to firebase db
   orderHandler = (event) => {
     event.preventDefault();
     // console.log(this.props.ingredients);
-    this.setState({ loading: true });
+
     const price = parseFloat(this.props.price).toFixed(2);
     const formData = {};
     for (let formElementId in this.state.orderForm) {
@@ -102,17 +103,7 @@ class ContactData extends React.Component {
       price: price,
       orderData: formData
     };
-    axios
-      .post("/orders.json", order)
-      .then((response) => {
-        this.setState({ loading: false });
-        // Redirectig to the root. Got the 'history' prop by spreading it in the Checkout component
-        // The other way is to wrap the ContactData component with 'withRouter'
-        this.props.history.push("/");
-      })
-      .catch((error) => {
-        this.setState({ loading: false });
-      });
+    this.props.onOrderBurger(order);
   };
 
   checkValidity = (value, rules) => {
@@ -193,7 +184,7 @@ class ContactData extends React.Component {
       </form>
     );
     // The Spinner is shown untill the POST request is executed
-    if (this.state.loading) {
+    if (this.props.loading) {
       form = <Spinner />;
     }
     return (
@@ -205,11 +196,23 @@ class ContactData extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+// getting the state from the redux store
+const mapStateToProps = (state) => {
   return {
-    ings: state.ingredients,
-    price: state.totalPrice
-  }
-}
+    ings: state.burgerBuilder.ingredients,
+    price: state.burgerBuilder.totalPrice,
+    loading: state.order.loading
+  };
+};
 
-export default connect(mapStateToProps)(ContactData);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+  };
+};
+
+//connecting the component and the redux store
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withErrorHandler(ContactData, axios));
