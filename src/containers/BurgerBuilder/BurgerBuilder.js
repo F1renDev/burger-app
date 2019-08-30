@@ -7,14 +7,12 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 import withErrorHandler from "../../hoc/withErrorHandler/withErrorHandler";
 import axios from "../../axios-orders";
 import { connect } from "react-redux";
-import * as actions from '../../store/actions/index'
+import * as actions from "../../store/actions/index";
 
 class BurgerBuilder extends React.Component {
   state = {
-    purchasing: false,
-    
+    purchasing: false
   };
-
 
   componentDidMount() {
     this.props.onInitIngredients();
@@ -36,9 +34,14 @@ class BurgerBuilder extends React.Component {
 
   // executed after 'Order now' was clicked
   purchaseHandler = () => {
-    this.setState({
-      purchasing: true
-    });
+    if (this.props.isAuthenticated) {
+      this.setState({
+        purchasing: true
+      });
+    } else {
+      this.props.onSetAuthRedirectPath("/checkout");
+      this.props.history.push("/auth");
+    }
   };
 
   // executed to remove the backdrop and the modal with the order summary
@@ -60,6 +63,7 @@ class BurgerBuilder extends React.Component {
       ...this.props.ings
     };
     // disabledInfo[key] is either true or false ( {salad: true, meat: false, ...} )
+    // eslint-disable-next-line no-unused-vars
     for (let key in disabledInfo) {
       disabledInfo[key] = disabledInfo[key] <= 0;
     }
@@ -88,6 +92,7 @@ class BurgerBuilder extends React.Component {
             disabled={disabledInfo}
             ordered={this.purchaseHandler}
             purchasable={this.updatePurchaseState(this.props.ings)}
+            isAuth={this.props.isAuthenticated}
           />
         </React.Fragment>
       );
@@ -119,19 +124,20 @@ const mapStateToProps = (state) => {
   return {
     ings: state.burgerBuilder.ingredients,
     price: state.burgerBuilder.totalPrice,
-    error: state.burgerBuilder.error
+    error: state.burgerBuilder.error,
+    isAuthenticated: state.auth.token !== null
   };
 };
 
 // mapping the dispatched actions to props
 const mapDispatchToProps = (dispatch) => {
   return {
-    onIngredientAdded: (ingName) =>
-      dispatch(actions.addIngredient(ingName)),
+    onIngredientAdded: (ingName) => dispatch(actions.addIngredient(ingName)),
     onIngredientRemoved: (ingName) =>
       dispatch(actions.removeIngredient(ingName)),
-      onInitIngredients: () => dispatch(actions.initIngridients()),
-      onInitPurchase: () => dispatch(actions.purchaseInit())
+    onInitIngredients: () => dispatch(actions.initIngridients()),
+    onInitPurchase: () => dispatch(actions.purchaseInit()),
+    onSetAuthRedirectPath: (path) => dispatch(actions.setAuthRedirectPath(path))
   };
 };
 

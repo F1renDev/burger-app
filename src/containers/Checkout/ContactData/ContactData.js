@@ -64,7 +64,8 @@ class ContactData extends React.Component {
         },
         value: "",
         validation: {
-          required: true
+          required: true,
+          isEmail: true
         },
         valid: false,
         touched: false
@@ -92,25 +93,31 @@ class ContactData extends React.Component {
   orderHandler = (event) => {
     event.preventDefault();
     // console.log(this.props.ingredients);
-
     const price = parseFloat(this.props.price).toFixed(2);
     const formData = {};
+    // eslint-disable-next-line no-unused-vars
     for (let formElementId in this.state.orderForm) {
       formData[formElementId] = this.state.orderForm[formElementId].value;
     }
     const order = {
       ingredients: this.props.ings,
       price: price,
-      orderData: formData
+      orderData: formData,
+      userId: this.props.userId
     };
-    this.props.onOrderBurger(order);
+    this.props.onOrderBurger(order, this.props.token);
   };
 
   checkValidity = (value, rules) => {
-    // isValid is set initially to true because even if one of the if checks in this block returnes false
+    // isValid is set initially to true because
+    // even if one of the if checks in this block returnes false
     // the isValid can be set to true by the last check and thus ingore all the previous checks
     // where it could have been set to false
     let isValid = true;
+
+    if (!rules) {
+      return true;
+    }
 
     if (rules.required) {
       // Using trim() because whitespaces are not treated as empty string
@@ -123,6 +130,11 @@ class ContactData extends React.Component {
 
     if (rules.maxLength) {
       isValid = value.length <= rules.maxLength && isValid;
+    }
+
+    if (rules.isEmail) {
+      const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+      isValid = pattern.test(value) && isValid;
     }
 
     return isValid;
@@ -146,6 +158,7 @@ class ContactData extends React.Component {
     // the formIsValid can be set to true by the last iteration and thus ingore
     // all the previous iterations where it could have been set to false
     let formIsValid = true;
+    // eslint-disable-next-line no-unused-vars
     for (let inputIdentifier in updatedOrderForm) {
       formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid;
     }
@@ -156,6 +169,7 @@ class ContactData extends React.Component {
   render() {
     // Turning the orderForm object into an array to loop through
     const formElementsArray = [];
+    // eslint-disable-next-line no-unused-vars
     for (let key in this.state.orderForm) {
       formElementsArray.push({
         id: key,
@@ -201,13 +215,15 @@ const mapStateToProps = (state) => {
   return {
     ings: state.burgerBuilder.ingredients,
     price: state.burgerBuilder.totalPrice,
-    loading: state.order.loading
+    loading: state.order.loading,
+    token: state.auth.token, 
+    userId: state.auth.userId
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+    onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
   };
 };
 
