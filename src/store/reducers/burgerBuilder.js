@@ -38,7 +38,6 @@ const reducer = (state = initialState, action) => {
         building: true
       };
     case actionTypes.SET_INGREDIENTS:
-      console.trace('Trace:');
       return {
         ...state,
         // wrong order because firebase places the ingredients alphabetically and not the way i want

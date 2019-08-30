@@ -7,6 +7,7 @@ import axios from "../../../axios-orders";
 import { connect } from "react-redux";
 import withErrorHandler from "../../../hoc/withErrorHandler/withErrorHandler";
 import * as actions from "../../../store/actions/index";
+import { checkValidity } from "../../../shared/utility";
 
 // ContactData component to get the user info before placing an order
 
@@ -92,7 +93,7 @@ class ContactData extends React.Component {
   // The info about a burger's ingredients and a user who ordered it is sent to firebase db
   orderHandler = (event) => {
     event.preventDefault();
-    // console.log(this.props.ingredients);
+
     const price = parseFloat(this.props.price).toFixed(2);
     const formData = {};
     // eslint-disable-next-line no-unused-vars
@@ -108,44 +109,12 @@ class ContactData extends React.Component {
     this.props.onOrderBurger(order, this.props.token);
   };
 
-  checkValidity = (value, rules) => {
-    // isValid is set initially to true because
-    // even if one of the if checks in this block returnes false
-    // the isValid can be set to true by the last check and thus ingore all the previous checks
-    // where it could have been set to false
-    let isValid = true;
-
-    if (!rules) {
-      return true;
-    }
-
-    if (rules.required) {
-      // Using trim() because whitespaces are not treated as empty string
-      isValid = value.trim() !== "" && isValid;
-    }
-
-    if (rules.minLength) {
-      isValid = value.length >= rules.minLength && isValid;
-    }
-
-    if (rules.maxLength) {
-      isValid = value.length <= rules.maxLength && isValid;
-    }
-
-    if (rules.isEmail) {
-      const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-      isValid = pattern.test(value) && isValid;
-    }
-
-    return isValid;
-  };
-
   // Handling the user input
   inputChangedHandler = (event, inputId) => {
     const updatedOrderForm = { ...this.state.orderForm };
     const updatedFormElement = { ...updatedOrderForm[inputId] };
     updatedFormElement.value = event.target.value;
-    updatedFormElement.valid = this.checkValidity(
+    updatedFormElement.valid = checkValidity(
       updatedFormElement.value,
       updatedFormElement.validation
     );
@@ -216,14 +185,15 @@ const mapStateToProps = (state) => {
     ings: state.burgerBuilder.ingredients,
     price: state.burgerBuilder.totalPrice,
     loading: state.order.loading,
-    token: state.auth.token, 
+    token: state.auth.token,
     userId: state.auth.userId
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
+    onOrderBurger: (orderData, token) =>
+      dispatch(actions.purchaseBurger(orderData, token))
   };
 };
 
