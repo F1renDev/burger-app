@@ -42,7 +42,7 @@ class Auth extends React.Component {
         touched: false
       }
     },
-    isSignup: true
+    isSignup: false
   };
 
   componentDidMount() {
@@ -128,8 +128,13 @@ class Auth extends React.Component {
     return (
       <div className={styles.auth}>
         <div>
-          <b><p>Either use 'test@mail.com' and '123123' login and password</p></b><hr />
-          <b><p>Or register a new user</p></b>
+          <b>
+            <p>Either use 'test@mail.com' and '123123' login and password</p>
+          </b>
+          <hr />
+          <b>
+            <p>Or register a new user</p>
+          </b>
         </div>
 
         {authRedirect}
