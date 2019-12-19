@@ -117,7 +117,7 @@ class Auth extends React.Component {
 
     if (this.props.error) {
       // firebase gives an error message
-      errorMessage = <p>{this.props.error.message}</p>;
+      errorMessage = <p className={styles.errorMessage}>{this.props.error.message}</p>;
     }
 
     let authRedirect = null;
