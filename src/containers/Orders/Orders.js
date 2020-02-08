@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import Order from "../../components/Order/Order";
 import axios from "../../axios-orders";
@@ -8,28 +8,27 @@ import { connect } from "react-redux";
 import Spinner from "../../components/UI/Spinner/Spinner";
 
 // Component for outputting multiple orders
-class Orders extends React.Component {
-  componentDidMount() {
-    // Getting the orders from firebase
-    this.props.onFetchOrders(this.props.token, this.props.userId);
-  }
+const Orders = props => {
+  const { token, userId } = props;
+  // Getting the orders from firebase
+  useEffect(() => {
+    props.onFetchOrders(props.token, props.userId);
+  }, [token, userId]);
 
-  render() {
-    let orders = <Spinner />;
-    if (!this.props.loading) {
-      orders = this.props.orders.map((order) => (
-        <Order
-          key={order.id}
-          ingredients={order.ingredients}
-          price={order.price}
-        />
-      ));
-    }
-    return <div>{orders}</div>;
+  let orders = <Spinner />;
+  if (!props.loading) {
+    orders = props.orders.map(order => (
+      <Order
+        key={order.id}
+        ingredients={order.ingredients}
+        price={order.price}
+      />
+    ));
   }
-}
+  return <div>{orders}</div>;
+};
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     orders: state.order.orders,
     loading: state.order.loading,
@@ -38,9 +37,10 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    onFetchOrders: (token, userId) => dispatch(actions.fetchOrders(token, userId))
+    onFetchOrders: (token, userId) =>
+      dispatch(actions.fetchOrders(token, userId))
   };
 };
 
