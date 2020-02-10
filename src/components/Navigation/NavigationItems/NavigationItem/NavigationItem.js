@@ -3,12 +3,13 @@ import { NavLink } from "react-router-dom";
 
 import styles from "./NavigationItem.module.css";
 
-const navigationItem = (props) => (
+const navigationItem = props => (
   <li className={styles.navigationItem}>
     <NavLink
       activeClassName={styles.active}
       to={props.link}
-      exact={props.exact}>
+      exact={props.exact}
+    >
       {props.children}
     </NavLink>
   </li>

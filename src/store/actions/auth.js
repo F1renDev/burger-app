@@ -16,7 +16,7 @@ export const authSuccess = (token, userId) => {
   };
 };
 
-export const authFail = (error) => {
+export const authFail = error => {
   return {
     type: actionTypes.AUTH_FAIL,
     error: error
@@ -33,8 +33,8 @@ export const logout = () => {
 };
 
 // the firebase token expires after 1 hour so i need to reflect this in the code
-export const checkAuthTimeout = (expirationTime) => {
-  return (dispatch) => {
+export const checkAuthTimeout = expirationTime => {
+  return dispatch => {
     setTimeout(() => {
       dispatch(logout());
     }, expirationTime * 1000);
@@ -43,7 +43,7 @@ export const checkAuthTimeout = (expirationTime) => {
 
 //! async code below
 export const auth = (email, password, isSignup) => {
-  return (dispatch) => {
+  return dispatch => {
     //authenticating the user via firebase authentication API
     dispatch(authStart());
     const authData = {
@@ -59,8 +59,7 @@ export const auth = (email, password, isSignup) => {
     }
     axios
       .post(url, authData)
-      .then((response) => {
-
+      .then(response => {
         const expirationDate = new Date(
           new Date().getTime() + response.data.expiresIn * 1000
         );
@@ -71,15 +70,14 @@ export const auth = (email, password, isSignup) => {
         dispatch(authSuccess(response.data.idToken, response.data.localId));
         dispatch(checkAuthTimeout(response.data.expiresIn));
       })
-      .catch((err) => {
-
+      .catch(err => {
         dispatch(authFail(err.response.data.error));
       });
   };
 };
 //! async code above
 
-export const setAuthRedirectPath = (path) => {
+export const setAuthRedirectPath = path => {
   return {
     type: actionTypes.SET_AUTH_REDIRECT_PATH,
     path: path
@@ -87,7 +85,7 @@ export const setAuthRedirectPath = (path) => {
 };
 
 export const authCheckState = () => {
-  return (dispatch) => {
+  return dispatch => {
     const token = localStorage.getItem("token");
     if (!token) {
       dispatch(logout());

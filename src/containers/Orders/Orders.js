@@ -9,11 +9,12 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 
 // Component for outputting multiple orders
 const Orders = props => {
-  const { token, userId } = props;
+  const { token, userId, onFetchOrders } = props;
+
   // Getting the orders from firebase
   useEffect(() => {
-    props.onFetchOrders(props.token, props.userId);
-  }, [token, userId]);
+    onFetchOrders(token, userId);
+  }, [token, userId, onFetchOrders]);
 
   let orders = <Spinner />;
   if (!props.loading) {

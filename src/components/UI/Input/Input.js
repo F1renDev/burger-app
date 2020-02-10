@@ -3,7 +3,7 @@ import React from "react";
 import styles from "./Input.module.css";
 
 // Input component for the order form
-const input = (props) => {
+const input = props => {
   let inputElement = null;
   const inputStyles = [styles.inputElement];
 
@@ -39,8 +39,9 @@ const input = (props) => {
         <select
           className={styles.inputElement}
           value={props.value}
-          onChange={props.changed}>
-          {props.elementConfig.options.map((option) => (
+          onChange={props.changed}
+        >
+          {props.elementConfig.options.map(option => (
             <option key={option.value} value={option.value}>
               {option.displayValue}
             </option>

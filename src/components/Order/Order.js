@@ -3,7 +3,7 @@ import React from "react";
 import styles from "./Order.module.css";
 
 // Component to display a single burger order
-const order = (props) => {
+const order = props => {
   const ingredients = [];
 
   // eslint-disable-next-line no-unused-vars
@@ -14,7 +14,7 @@ const order = (props) => {
     });
   }
 
-  const preparedIngredients = ingredients.map((item) => {
+  const preparedIngredients = ingredients.map(item => {
     return (
       <span
         style={{
@@ -24,7 +24,8 @@ const order = (props) => {
           border: "1px solid #ccc",
           padding: "5px"
         }}
-        key={item.name}>
+        key={item.name}
+      >
         {item.name} ({item.amount})
       </span>
     );

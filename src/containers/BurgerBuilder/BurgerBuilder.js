@@ -12,9 +12,11 @@ import * as actions from "../../store/actions/index";
 const BurgerBuilder = props => {
   const [purchasing, setPurchasing] = useState(false);
 
+  const { onInitIngredients } = props;
+
   useEffect(() => {
-    props.onInitIngredients();
-  }, []);
+    onInitIngredients();
+  }, [onInitIngredients]);
 
   // if there are no ingredients added, 'false' is returned and passed further to disable
   // the order button

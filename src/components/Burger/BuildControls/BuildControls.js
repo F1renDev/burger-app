@@ -10,12 +10,12 @@ const controls = [
 ];
 
 // rendering a list of BuildControl components based on the quantity of ingredients
-const buildControls = (props) => (
+const buildControls = props => (
   <div className={styles.buildControls}>
     <p>
       Current price: <strong>{props.price.toFixed(2)}</strong>
     </p>
-    {controls.map((item) => {
+    {controls.map(item => {
       return (
         <BuildControl
           key={item.label}
@@ -29,7 +29,8 @@ const buildControls = (props) => (
     <button
       className={styles.orderButton}
       onClick={props.ordered}
-      disabled={!props.purchasable}>
+      disabled={!props.purchasable}
+    >
       {props.isAuth ? "ORDER NOW" : "SIGN-UP TO ORDER"}
     </button>
   </div>

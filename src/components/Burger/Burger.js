@@ -2,10 +2,10 @@ import React from "react";
 import styles from "./Burger.module.css";
 import BurgerIngredient from "./BurgerIngredient/BurgerIngredient";
 
-const burger = (props) => {
+const burger = props => {
   // getting the keys from the ingredients object and make an array of them (cheese, meat, etc)
   let transformedIngredients = Object.keys(props.ingredients)
-    .map((ingredientItem) => {
+    .map(ingredientItem => {
       // then make an array ( with help of Array()) where the length of array
       // is a value for a given key in the initial array
       return [...Array(props.ingredients[ingredientItem])].map(

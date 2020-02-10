@@ -4,7 +4,7 @@ import Button from "../../UI/Button/Button";
 import styles from "./CheckoutSummary.module.css";
 
 // Displaying a checkout info on a separete page with ability to cancel or to continue
-const checkoutSummary = (props) => {
+const checkoutSummary = props => {
   return (
     <div className={styles.checkoutSummary}>
       <h1>Hope it tastes well!</h1>
